@@ -11775,7 +11775,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Background">Background<a class="anchor-link" href="#Background">&#182;</a></h1>
+<h1 id="Introduction-and-background">Introduction and background<a class="anchor-link" href="#Introduction-and-background">&#182;</a></h1>
 </div>
 </div>
 </div>
@@ -11783,17 +11783,18 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This analysis is related to the <i>Buckeye issue log</i> email storm happened on November 1st on a specific Company intranet.<br>
-This event was rather limited, at least compared to previous cases, and it was characterized by:</p>
+<p>In some occasions it can happen that an Outlook mailing list gets corrupted, as a result of that a specific email is spread throughout the Company mailing list. This kind of event is also called <a href="https://en.wikipedia.org/wiki/Email_storm">email storm</a>.</p>
+<p>This analysis is related to the <i>Buckeye issue log</i> email storm happened on November 1st. The event was rather limited, at least compared to previous cases, and it was characterized by:</p>
 <ul>
-<li>153 email</li>
+<li>152 <em>reply to all</em> emails</li>
 <li>146 unique senders (some replied more than once)</li>
 <li>142 unique reference indicators</li>
 <li>limited time frame: about 1 hour(*)</li>
+<li>2 emails had no text, just pictures</li>
 </ul>
-<p><i>(*) NOTE: This time frame is related to se sent time</i></p>
-<p>The original dataframe contains also names and reference indicators, these variables have been excluded on purpose from the anonymized dataframe used for this analysis.</p>
-<p>Here under the first 5 observation of the dataframe:</p>
+<p><i>(*) NOTE: This time frame is related to the sent time</i></p>
+<p>A dataframe characterized by several variables has been extracted using the Outlook COM interface with python and pywin32. From the overall dataframe names and reference indicators have been excluded to anonymize the data used for this analysis.</p>
+<p>Here under the first 5 observations of the resulting dataframe where the first one is the storm initiator:</p>
 
 </div>
 </div>
@@ -11816,13 +11817,26 @@ This event was rather limited, at least compared to previous cases, and it was c
 <li>153 rows (one per email/observation)</li>
 <li>6 columns/variables: Region, SentOn, ReceivedTime, LetterCount, Angriness and AngrinessBinned </li>
 </ul>
-<p>The <b>Region</b> has been derived from the senders' contact card where the location is mentioned.</p>
-<p>The <b>Angriness</b> has been defined as the ratio between capital letters and the total amount of letters. It would be nice to extend/improve this definition using info from the email body such as the font size and color but unfortunately this info appears to be not easily accessible with the win32 client I used to parse the raw data.</p>
-<p>The angriness continuous variable has been binned in the following groups:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Some details on the variables:</p>
 <ul>
-<li>Angriness below 0.3 --&gt; <i>Not angry</i></li>
-<li>Angriness between 0.3 and 0.8 --&gt; <i>Moderately angry</i></li>
-<li>Angriness above 0.8 --&gt; <i>Angry</i></li>
+<li>The <b>Region</b> has been derived from the senders' contact card where the location is mentioned.</li>
+<li>The <strong>SentOn</strong> and the <strong>ReceivedTime</strong> are obtained directly from the Outlook COM interface and are related to central Europe time zone. The Dataframe has been ordered acording to the SentOn time.</li>
+<li>The <strong>LetterCount</strong> is calculated as the number of letters in the email body. It is not straightforward how to split the real email body from the rest of the text that may (or may noy) include a signature and previous answers. I have decided to consider everything before the first <em>From</em> or <em>Van</em> as the email body. This works but overestimates the letter count since it includes the signature (not always present).</li>
+<li>The <b>Angriness</b> has been defined as the ratio between capital letters and the total amount of letters. It would be nice to extend/improve this definition using info from the email body such as the font size and color but unfortunately this info appears to be not easily accessible with the win32 client I used to parse the raw data.</li>
+</ul>
+<p>Finally The angriness continuous variable has been binned in the following groups:</p>
+<ul>
+<li>Angriness below or equal to 0.3---&gt; <i>Not angry</i></li>
+<li>Angriness between 0.3 and 0.8 ---&gt; <i>Moderately angry</i></li>
+<li>Angriness above or equal to 0.8 --&gt; <i>Angry</i></li>
 </ul>
 
 </div>
@@ -11840,8 +11854,17 @@ This event was rather limited, at least compared to previous cases, and it was c
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>An exploratory analysis tries to find patterns ans relationships in the data without performing any modeling or prediction.</p>
-<p>It is crucial in an EDA (Exploratory Data Analysis) to have in mind a question, here some:</p>
+<p>Once a <a href="https://en.wikipedia.org/wiki/Tidy_data">tidy dataframe</a> is ready we can perform an <a href="https://en.wikipedia.org/wiki/Exploratory_data_analysis">exploratory data analysis</a> (aka EDA).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>An exploratory analysis tries to find patterns ans relationships in the data without performing any modeling or prediction.<br>
+It is crucial in an EDA to have in mind question(s) we would like to answer, here some:</p>
 <ol>
 <li>Did the email storm create issues to the email servers?</li>
 <li>Is there any relationship between the amount of emails sent/received in time and the angriness in the replies?</li>
@@ -11857,7 +11880,7 @@ This event was rather limited, at least compared to previous cases, and it was c
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Did-the-email-storm-create-issues-to-the-email-servers?">Did the email storm create issues to the email servers?<a class="anchor-link" href="#Did-the-email-storm-create-issues-to-the-email-servers?">&#182;</a></h2>
+<h2 id="Did-the-email-storm-create-issues-to-the-mail-servers?">Did the email storm create issues to the mail servers?<a class="anchor-link" href="#Did-the-email-storm-create-issues-to-the-mail-servers?">&#182;</a></h2>
 </div>
 </div>
 </div>
@@ -11865,7 +11888,7 @@ This event was rather limited, at least compared to previous cases, and it was c
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><b>Figure 1</b> shows the evolution in time of the email count using the sent time as reference. For each email the travel time is also represented as an horizontal red segment. The longer the segment the longer the delay between the sent time and the received time.</p>
+<p><b>Figure 1</b> shows the evolution in time of the email count using the sent time as reference. For each email the travel time is represented as an horizontal red segment. The longer the segment the longer the delay between the sent time and the received time.</p>
 
 </div>
 </div>
@@ -11884,7 +11907,16 @@ This event was rather limited, at least compared to previous cases, and it was c
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The travel time appears to be not correlated to the sent time (it is strongly correlated to the received time, as expected). This can be seen in <b>Figure 2</b>:</p>
+<p>Right from the beginning the email travel time was significant, some hundreads or even thousands of seconds. This may be correlated to issues on the mail servers beacuse of the huge traffic generated by the email storm.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The travel time appears to be not correlated to the sent time in geenral. <b>Figure 2</b> provides also a regional overview:</p>
 
 </div>
 </div>
@@ -11894,7 +11926,7 @@ This event was rather limited, at least compared to previous cases, and it was c
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><img src="./images/eda_q1_2.png" alt="">
-<b>Figure 2 - Received or sent time in function of the travel time</b></p>
+<b>Figure 2 - Travel time in function of the sent time (the initial email has been excluded)</b></p>
 
 </div>
 </div>
@@ -11903,7 +11935,7 @@ This event was rather limited, at least compared to previous cases, and it was c
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In conclusion it appears the mail server(s) had quite some difficulties handling the huge amount of emails (order of magnitude ~ 10<sup>8</sup> emails) looking at the significant travel time. These difficulties were more or less constant throughout the event time frame considering that the travel time is not increasing in time.</p>
+<p>In conclusion it appears that the mail server(s) had quite some difficulties handling all the emails considering the very significant travel times. These difficulties were more or less constant throughout the event time frame also considering a split per region.</p>
 
 </div>
 </div>
@@ -11920,7 +11952,7 @@ This event was rather limited, at least compared to previous cases, and it was c
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In <strong>Figure 3</strong> the normalized email count is plotted together with the angriness in function of the sent time. It is quite evident that the angry replies have been written when most of the emails were sent. More emails flowing in, more frustration more probability to have one angry reply.</p>
+<p>In <strong>Figure 3</strong> the normalized email count is plotted together with the angriness in function of the sent time. It is quite evident that the angry replies have been written when most of the emails were sent. More emails flowing in, more frustration and more probability to have angry replies.</p>
 
 </div>
 </div>
@@ -12002,7 +12034,7 @@ This event was rather limited, at least compared to previous cases, and it was c
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>East people were more less prone to reply to all and they avoided any angry reply. It is worth here that during the 1st of November is was public holiday in some countries, and in particular in some big eastern countries.</p>
+<p>Eastern people were less prone to <em>reply to all</em> and they avoided angry replies. It is worth to mention that during the 1st of November is was public holiday in some countries, and in particular in some big eastern countries.</p>
 
 </div>
 </div>
@@ -12040,7 +12072,7 @@ This event was rather limited, at least compared to previous cases, and it was c
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Conclusions">Conclusions<a class="anchor-link" href="#Conclusions">&#182;</a></h2>
+<h2 id="EDA-Conclusions">EDA Conclusions<a class="anchor-link" href="#EDA-Conclusions">&#182;</a></h2>
 </div>
 </div>
 </div>
